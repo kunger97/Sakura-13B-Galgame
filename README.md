@@ -25,6 +25,8 @@
 **对于模型翻译的人称代词问题（错用，乱加，主宾混淆，男女不分等）和上下文理解问题，如果有好的想法或建议，欢迎提issue！**
 
 ### TODO：见https://github.com/SakuraLLM/Sakura-13B-Galgame/issues/42
+## What's new in this repo
+允许英特尔CPU用户和XPU（ARC/DataCenterGPU）用户使用ITREX.CPP,IPEX,BigDL方式加载模型，利用英特尔硬件特性的性能优化。
 
 ## 快速开始
 
