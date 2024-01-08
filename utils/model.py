@@ -435,7 +435,42 @@ class SakuraModel:
     def __itrex_cpp_model(self, model: ModelTypes, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig):
         input_tokens = tokenizer(prompt, return_tensors="pt")
         input_tokens_len = input_tokens.input_ids.shape[-1]
-        output = model.generate(input_tokens.input_ids, ctx_size=generation_config.__dict__['max_new_tokens'] * 4, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'])[0]
+        import torch
+        from typing import List
+        from transformers import StoppingCriteria, StoppingCriteriaList
+
+        # Todo - 判断EOS Token来停止模型输出。
+        class StopOnTokens(StoppingCriteria):
+            def __init__(self, stop_token_id: List[int]):
+                self.stop_token_id = stop_token_id
+
+            def __call__(
+                self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
+            ) -> bool:
+                for stop_id in self.stop_token_id:
+                        #print("检查EOS")
+                        #print(input_ids[0][input_ids.shape[-1] - 1])
+                        if input_ids[0][input_ids.shape[-1] - 1] == stop_id:
+                            return True
+                return False
+
+        if model_version == "0.9":
+            stopping_criteria = StoppingCriteriaList(
+                [
+                    StopOnTokens(
+                        stop_token_id=[151645], #这里写死了QWEN的模型EOS Token
+                    )
+                ]
+            )
+        else:
+            stopping_criteria = StoppingCriteriaList(
+                [
+                    StopOnTokens(
+                        stop_token_id=[tokenizer.eos_token_id],
+                    )
+                ]
+            )    
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'])[0]
         #print(output)
         new_tokens = len(output) - input_tokens_len
 
