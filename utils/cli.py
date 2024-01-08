@@ -26,6 +26,12 @@ def parse_args(do_validation:bool=False, add_extra_args_fn:any=None):
     parser.add_argument("--llama_cpp", action="store_true", help="whether to use llama.cpp.")
     parser.add_argument("--use_gpu", action="store_true", help="whether to use gpu when using llama.cpp.")
     parser.add_argument("--n_gpu_layers", type=int, default=0, help="layers cnt when using gpu in llama.cpp")
+    parser.add_argument("--itrex_cpp", action="store_true", help="whether to use itrex.cpp.")
+    parser.add_argument("--itrex_dtype", type=str, default="int8", help="quantized level of itrex.cpp now support ['fp32', 'int8', 'int4', 'fp8', 'fp4', 'nf4']")
+    parser.add_argument("--ipex", action="store_true", help="whether to use intel extension for pytorch load model")
+    parser.add_argument("--big_dl", action="store_true", help="whether to use big-dl llm to load model")
+    parser.add_argument("--big_dl_dtype", type=str, default="sym_int8", help="quantized level of big_dl now support ['sym_int4', 'asym_int4', 'sym_int5', 'asym_int5' , 'sym_int8', 'nf3', 'nf4', 'fp4', 'fp8', 'fp8_e4m3', 'fp8_e5m2', 'fp16', 'bf16']")
+    parser.add_argument("--use_xpu", action="store_true", help="whether to use XPU in ipex or big-dl llm")
 
     parser.add_argument("--vllm", action="store_true", help="whether to use vllm.")
     parser.add_argument("--enforce_eager", action="store_true", help="enable eager mode in vllm.")
@@ -50,7 +56,21 @@ def args_validation(args) -> bool:
     if args.llama_cpp:
         if args.use_gptq_model:
             raise ValueError("You are using both use_gptq_model and llama_cpp flag, which is not supported.")
+        if args.ipex:
+            raise ValueError("You can't load model via itrex.cpp and intel extension for pytorch in seam time.")
+        if args.big_dl:
+            raise ValueError("You can't load model via itrex.cpp and big-dl llm in seam time.")
         from llama_cpp import Llama
+
+    if args.itrex_cpp:
+        if args.llama_cpp:
+            raise ValueError("You can't load model via llama.cpp and itrex.cpp in seam time.")
+        if args.ipex:
+            raise ValueError("You can't load model via itrex.cpp and intel extension for pytorch in seam time.")
+        if args.big_dl:
+            raise ValueError("You can't load model via itrex.cpp and big-dl llm in seam time.")
+        if args.use_xpu:
+            raise ValueError("itrex.cpp is not support gpu(xpu) accelerate for now.")
 
     if args.llama:
         from transformers import LlamaForCausalLM, LlamaTokenizer

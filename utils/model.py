@@ -43,6 +43,15 @@ class SakuraModelConfig:
     llama_cpp: bool = False
     use_gpu: bool = False
     n_gpu_layers: int = 0
+    
+    #intel llm
+    itrex_cpp: bool = False
+    ipex: bool = False
+    big_dl: bool = False
+    use_xpu: bool = False
+
+    itrex_dtype: str = "int8"
+    big_dl_dtype: str = "sym_int8"
 
     # vllm
     vllm: bool = False
@@ -107,6 +116,15 @@ def load_model(args: SakuraModelConfig):
     if args.use_gptq_model:
         from auto_gptq import AutoGPTQForCausalLM
 
+    if args.itrex_cpp:
+        from intel_extension_for_transformers.transformers import AutoModelForCausalLM, WeightOnlyQuantConfig
+
+    if args.ipex:
+        import intel_extension_for_pytorch as ipex
+
+    if args.big_dl:
+        from bigdl.llm.transformers import AutoModelForCausalLM    
+
     logger.info("loading model ...")
 
     if not args.llama_cpp:
@@ -153,6 +171,17 @@ def load_model(args: SakuraModelConfig):
         )
         engine = AsyncLLMEngine.from_engine_args(engine_args)
         model = MixLLMEngine(engine)
+    elif args.itrex_cpp:
+        woq_config = WeightOnlyQuantConfig(compute_dtype="bf16", weight_dtype=args.itrex_dtype)
+        model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, quantization_config=woq_config, trust_remote_code=True)
+    elif args.ipex:
+        model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
+        if args.use_xpu:
+            model = model.to('xpu')
+    elif args.big_dl:
+        model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True, use_flash_attn=False)
+        if args.use_xpu:
+            model = model.to("xpu")
     else:
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
 
@@ -360,7 +389,7 @@ class SakuraModel:
         input_tokens_len = output['usage']['prompt_tokens']
         new_tokens = output['usage']['completion_tokens']
         return response, (input_tokens_len, new_tokens)
-
+    
     def __llama_cpp_model_stream(self, model: "Llama", prompt: str, generation_config: GenerationConfig):
         logger.debug(f"prompt is: {prompt}")
         for output in model(prompt, max_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], repeat_penalty=generation_config.__dict__['repetition_penalty'], frequency_penalty=generation_config.__dict__['frequency_penalty'], stream=True):
@@ -403,6 +432,24 @@ class SakuraModel:
             delta_text = output_text.removeprefix(previous_output)
             previous_output = output_text
             yield delta_text, finish_reason
+    def __itrex_cpp_model(self, model: ModelTypes, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig):
+        input_tokens = tokenizer(prompt, return_tensors="pt")
+        input_tokens_len = input_tokens.input_ids.shape[-1]
+        output = model.generate(input_tokens.input_ids, ctx_size=generation_config.__dict__['max_new_tokens'] * 4, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'])[0]
+        #print(output)
+        new_tokens = len(output) - input_tokens_len
+
+        response = tokenizer.decode(output)
+        output = utils.split_response(response, model_version)
+        return output, (input_tokens_len, new_tokens)
+
+    def __itrex_cpp_model_stream(self, model: ModelTypes, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig):
+        from transformers import TextStreamer
+        input_tokens = tokenizer(prompt, return_tensors="pt")
+        input_tokens_len = input_tokens.input_ids.shape[-1]
+        streamer = TextStreamer(tokenizer)
+        output = model.generate(input_tokens.input_ids, streamer=streamer, ctx_size=generation_config.__dict__['max_new_tokens'] * 4, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'])[0]
+        yield output, 'default'  
 
     def __general_model(self, model: ModelTypes, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig):
         input_tokens = tokenizer(prompt, return_tensors="pt")
@@ -469,6 +516,8 @@ class SakuraModel:
                     output, (input_tokens_len, new_tokens) = self.__llama_cpp_model(model, prompt, generation_config)
                 elif self.cfg.vllm:
                     output, (input_tokens_len, new_tokens) = self.__vllm_model(model, prompt, generation_config)
+                elif self.cfg.itrex_cpp:
+                    output, (input_tokens_len, new_tokens) = self.__itrex_cpp_model(model, tokenizer, prompt, model_version, generation_config)
                 else:
                     output, (input_tokens_len, new_tokens) = self.__general_model(model, tokenizer, prompt, model_version, generation_config)
                 t1 = time.time()
@@ -521,6 +570,8 @@ class SakuraModel:
             for output, finish_reason in self.__vllm_model_stream(model, prompt, generation_config):
                 token_cnt += 1
                 yield output, finish_reason
+        elif self.cfg.itrex_cpp:
+            yield "", "Not Support"
         else:
             self.check_messages(messages)
             for output, finish_reason in self.__general_model_stream(model, tokenizer, messages, model_version, generation_config):
@@ -569,6 +620,8 @@ class SakuraModel:
             output, (input_tokens_len, new_tokens) = self.__llama_cpp_model(model, prompt, generation_config)
         elif self.cfg.vllm:
             output, (input_tokens_len, new_tokens) = self.__vllm_model(model, prompt, generation_config)
+        elif self.cfg.itrex_cpp:
+            output, (input_tokens_len, new_tokens) = self.__itrex_cpp_model(model, tokenizer, prompt, model_version, generation_config)
         else:
             output, (input_tokens_len, new_tokens) = self.__general_model(model, tokenizer, prompt, model_version, generation_config)
         t1 = time.time()
@@ -582,6 +635,8 @@ class SakuraModel:
                 output, (input_tokens_len, new_tokens) = self.__llama_cpp_model(model, prompt, generation_config)
             elif self.cfg.vllm:
                 output, (input_tokens_len, new_tokens) = self.__vllm_model(model, prompt, generation_config)
+            elif self.cfg.itrex_cpp:
+                output, (input_tokens_len, new_tokens) = self.__itrex_cpp_model(model, tokenizer, prompt, model_version, generation_config)
             else:
                 output, (input_tokens_len, new_tokens) = self.__general_model(model, tokenizer, prompt, model_version, generation_config)
         return output
