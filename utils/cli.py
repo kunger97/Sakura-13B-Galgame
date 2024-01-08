@@ -57,9 +57,9 @@ def args_validation(args) -> bool:
         if args.use_gptq_model:
             raise ValueError("You are using both use_gptq_model and llama_cpp flag, which is not supported.")
         if args.ipex:
-            raise ValueError("You can't load model via itrex.cpp and intel extension for pytorch in seam time.")
+            raise ValueError("You can't load model via llama.cpp and intel extension for pytorch in seam time.")
         if args.big_dl:
-            raise ValueError("You can't load model via itrex.cpp and big-dl llm in seam time.")
+            raise ValueError("You can't load model via llama.cpp and big-dl llm in seam time.")
         from llama_cpp import Llama
 
     if args.itrex_cpp:
