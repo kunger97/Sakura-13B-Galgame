@@ -28,6 +28,14 @@
 ## What's new in this repo
 允许英特尔CPU用户和XPU（ARC/DataCenterGPU）用户使用ITREX.CPP,IPEX,BigDL方式加载模型，利用英特尔硬件特性的性能优化。
 
+**其实我根本不会Python，对于使用中出现的问题，恕不提供支持**
+
+**ITREX和BIGDL会在加载时对模型进行量化，您可能需要稍等一段时间**
+
+**我们从未对原模型进行修改，对于模型输出存在的任何问题（由于ITREX.cpp不支持某些参数，可能导致预期外的输出行为），请到原Repo中反馈**
+
+**以下库均各自有依赖包，请参阅各仓库文档安装**
+
 ### ITREX.CPP
 为英特尔硬件打造的提供硬件加速的类似于llama.cpp工具（暂不支持XPU加速）[intel-extension-for-transformers](https://github.com/intel/intel-extension-for-transformers/)
 
