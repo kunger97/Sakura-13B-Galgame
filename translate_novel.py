@@ -44,7 +44,7 @@ def get_novel_text_list(data_path, text_length):
         data_list.append(text)
     return data_raw, data_list
 
-def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig, text_length: int, llama_cpp: bool):
+def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig, text_length: int, llama_cpp: bool, itrex_cpp: bool):
     backup_generation_config_stage2 = GenerationConfig(
             temperature=0.1,
             top_p=0.3,
@@ -98,6 +98,51 @@ def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, pr
             output = generate(model, backup_generation_config[stage-1])
         response = output['choices'][0]['text']
         return response
+    
+    elif itrex_cpp:
+        import torch
+        from typing import List
+        from transformers import StoppingCriteria, StoppingCriteriaList
+
+        # Todo - 判断EOS Token来停止模型输出。
+        class StopOnTokens(StoppingCriteria):
+            def __init__(self, stop_token_id: List[int]):
+                self.stop_token_id = stop_token_id
+
+            def __call__(
+                self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
+            ) -> bool:
+                for stop_id in self.stop_token_id:
+                        #print("检查EOS")
+                        #print(input_ids[0][input_ids.shape[-1] - 1])
+                        if input_ids[0][input_ids.shape[-1] - 1] == stop_id:
+                            return True
+                return False
+
+        if model_version == "0.9":
+            stopping_criteria = StoppingCriteriaList(
+                [
+                    StopOnTokens(
+                        stop_token_id=[151645], #这里写死了QWEN的模型EOS Token
+                    )
+                ]
+            )
+        else:
+            stopping_criteria = StoppingCriteriaList(
+                [
+                    StopOnTokens(
+                        stop_token_id=[tokenizer.eos_token_id],
+                    )
+                ]
+            )    
+
+        input_tokens = tokenizer(prompt, return_tensors="pt")
+        stage = 0
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
+        # ITREX.cpp 不支持frequency_penalty参数，所以不尝试对退化的输出进行重试。
+        response = tokenizer.decode(output)
+        output = utils.split_response(response, model_version)
+        return output
 
     # llm sharp backend
     # elif use_llm_sharp:
@@ -230,6 +275,7 @@ def main():
                 generation_config,
                 sakura_model.cfg.text_length,
                 sakura_model.cfg.llama_cpp,
+                sakura_model.cfg.itrex_cpp,
             )
             data += output.strip() + "\n"
 
