@@ -469,12 +469,20 @@ class SakuraModel:
                         stop_token_id=[tokenizer.eos_token_id],
                     )
                 ]
-            )    
-        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=generation_config.__dict__['max_new_tokens'] * 4, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
-        #print(output)
+            )
+        # DEBUG TAG
+        if generation_config.__dict__['max_new_tokens'] < 100:
+            ctx_size = 500
+        else:
+            ctx_size = generation_config.__dict__['max_new_tokens']
+        print(input_tokens)
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
+        print(output)
         new_tokens = len(output) - input_tokens_len
 
         response = tokenizer.decode(output)
+        print(response)
+        # DEBUG TAG
         output = utils.split_response(response, model_version)
         return output, (input_tokens_len, new_tokens)
 
