@@ -470,7 +470,7 @@ class SakuraModel:
                     )
                 ]
             )    
-        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'])[0]
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
         #print(output)
         new_tokens = len(output) - input_tokens_len
 
@@ -483,7 +483,7 @@ class SakuraModel:
         input_tokens = tokenizer(prompt, return_tensors="pt")
         input_tokens_len = input_tokens.input_ids.shape[-1]
         streamer = TextStreamer(tokenizer)
-        output = model.generate(input_tokens.input_ids, streamer=streamer, ctx_size=generation_config.__dict__['max_new_tokens'] * 4, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'])[0]
+        output = model.generate(input_tokens.input_ids, streamer=streamer, ctx_size=generation_config.__dict__['max_new_tokens'] * 4, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
         yield output, 'default'  
 
     def __general_model(self, model: ModelTypes, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig):
