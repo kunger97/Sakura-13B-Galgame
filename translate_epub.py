@@ -159,7 +159,7 @@ def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, pr
 
         input_tokens = tokenizer(prompt, return_tensors="pt")
         stage = 0
-        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=generation_config.__dict__['max_new_tokens'] * 4, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
         # ITREX.cpp 不支持frequency_penalty参数，所以不尝试对退化的输出进行重试。
         response = tokenizer.decode(output)
         output = utils.split_response(response, model_version)
