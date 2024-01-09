@@ -142,9 +142,6 @@ def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, pr
         # ITREX.cpp 不支持frequency_penalty参数，所以不尝试对退化的输出进行重试。
         response = tokenizer.decode(output)
         output = utils.split_response(response, model_version)
-        print(prompt)
-        print("===========================")
-        print(output)
         return output
 
     # llm sharp backend
