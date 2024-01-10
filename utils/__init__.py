@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 def split_response(response, model_version):
     response = response.replace("</s>", "")
+    response = response.replace("<|im_end|>", "")
     if model_version == '0.5' or '0.8' in model_version:
         output = response.split("<reserved_107>")[1]
         return output

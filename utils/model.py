@@ -116,18 +116,6 @@ def load_model(args: SakuraModelConfig):
     if args.use_gptq_model:
         from auto_gptq import AutoGPTQForCausalLM
 
-    if args.itrex_cpp:
-        from intel_extension_for_transformers.transformers import AutoModelForCausalLM, WeightOnlyQuantConfig
-
-    if args.ipex:
-        from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
-        import intel_extension_for_pytorch as ipex
-
-    if args.big_dl:
-        from bigdl.llm.transformers import AutoModelForCausalLM    
-
-    from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig        
-
     logger.info("loading model ...")
 
     if not args.llama_cpp:
@@ -175,13 +163,16 @@ def load_model(args: SakuraModelConfig):
         engine = AsyncLLMEngine.from_engine_args(engine_args)
         model = MixLLMEngine(engine)
     elif args.itrex_cpp:
+        from intel_extension_for_transformers.transformers import AutoModelForCausalLM, WeightOnlyQuantConfig
         woq_config = WeightOnlyQuantConfig(compute_dtype="bf16", scale_dtype="bf16", weight_dtype=args.itrex_dtype)
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, quantization_config=woq_config, trust_remote_code=True)
     elif args.ipex:
+        import intel_extension_for_pytorch as ipex
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
         if args.use_xpu:
             model = model.to('xpu')
     elif args.big_dl:
+        from bigdl.llm.transformers import AutoModelForCausalLM  
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True, use_flash_attn=False)
         if args.use_xpu:
             model = model.to("xpu")
