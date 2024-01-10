@@ -470,19 +470,15 @@ class SakuraModel:
                     )
                 ]
             )
-        # DEBUG TAG
+
         if generation_config.__dict__['max_new_tokens'] < 100:
-            ctx_size = 500
+            ctx_size = 512
         else:
             ctx_size = generation_config.__dict__['max_new_tokens']
-        print(input_tokens)
-        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
-        print(output)
+        #FIXME 长文本有退化问题，而且似乎退化的输出不遵循ctx_size而停止？
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, shift_roped_k=True, ctx_size=ctx_size, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
         new_tokens = len(output) - input_tokens_len
-
         response = tokenizer.decode(output)
-        print(response)
-        # DEBUG TAG
         output = utils.split_response(response, model_version)
         return output, (input_tokens_len, new_tokens)
 
