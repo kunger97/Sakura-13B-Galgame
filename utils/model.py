@@ -120,10 +120,13 @@ def load_model(args: SakuraModelConfig):
         from intel_extension_for_transformers.transformers import AutoModelForCausalLM, WeightOnlyQuantConfig
 
     if args.ipex:
+        from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
         import intel_extension_for_pytorch as ipex
 
     if args.big_dl:
         from bigdl.llm.transformers import AutoModelForCausalLM    
+
+    from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig        
 
     logger.info("loading model ...")
 
