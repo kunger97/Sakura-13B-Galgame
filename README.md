@@ -38,6 +38,9 @@
 
 ### ITREX.CPP
 为英特尔硬件打造的提供硬件加速的类似于llama.cpp工具（暂不支持XPU加速）[intel-extension-for-transformers](https://github.com/intel/intel-extension-for-transformers/)
+**已知问题：ITREX.CPP不支持frequency_penalty参数，无法通过调整这个参数来避免模型退化问题**
+
+**推理速度在Intel Xeon 8480+ CPU下快于llama.cpp 8-10秒，Intel正在积极准备将相关优化合并到llama.cpp，未来本模式可能被移除**
 
 ### IPEX
 让pytorch支持英特尔XPU，可以将模型加载到英特尔独显上允许推理或微调 [intel-extension-for-pytorch](https://github.com/intel/intel-extension-for-pytorch)
