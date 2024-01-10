@@ -471,12 +471,15 @@ class SakuraModel:
                 ]
             )
 
-        if generation_config.__dict__['max_new_tokens'] < 100:
-            ctx_size = 512
+        # ctx_size change may cause model reinit?
+        if generation_config.__dict__['max_new_tokens'] < 2000:
+            ctx_size = 2048
+        elif generation_config.__dict__['max_new_tokens'] > 2000 and generation_config.__dict__['max_new_tokens'] < 4000:
+            ctx_size = 4096
         else:
             ctx_size = generation_config.__dict__['max_new_tokens']
-        #FIXME 长文本有退化问题，而且似乎退化的输出不遵循ctx_size而停止？
-        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
+
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
         new_tokens = len(output) - input_tokens_len
         response = tokenizer.decode(output)
         output = utils.split_response(response, model_version)
@@ -487,7 +490,11 @@ class SakuraModel:
         input_tokens = tokenizer(prompt, return_tensors="pt")
         input_tokens_len = input_tokens.input_ids.shape[-1]
         streamer = TextStreamer(tokenizer)
-        output = model.generate(input_tokens.input_ids, streamer=streamer, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
+        if generation_config.__dict__['max_new_tokens'] < 200:
+            ctx_size = 500
+        else:
+            ctx_size = 2048
+        output = model.generate(input_tokens.input_ids, streamer=streamer, ctx_size=ctx_size, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
         yield output, 'default'  
 
     def __general_model(self, model: ModelTypes, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig):
