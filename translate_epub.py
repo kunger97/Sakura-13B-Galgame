@@ -127,12 +127,17 @@ def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, pr
 
         # Todo - 判断EOS Token来停止模型输出。
         class StopOnTokens(StoppingCriteria):
-            def __init__(self, stop_token_id: List[int]):
+            def __init__(self, start_length, stop_token_id: List[int], max_new_tokens):
+                self.start_length = start_length
                 self.stop_token_id = stop_token_id
+                self.max_new_tokens = max_new_tokens
 
             def __call__(
                 self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
             ) -> bool:
+                #print(f"起始Token{self.start_length}，当前Token数量{input_ids.shape[-1] - self.start_length}")
+                if input_ids.shape[-1] - self.start_length > self.max_new_tokens:
+                    return True
                 for stop_id in self.stop_token_id:
                         #print("检查EOS")
                         #print(input_ids[0][input_ids.shape[-1] - 1])
@@ -144,7 +149,9 @@ def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, pr
             stopping_criteria = StoppingCriteriaList(
                 [
                     StopOnTokens(
+                        start_length=input_tokens.input_ids.shape[1],
                         stop_token_id=[151645], #这里写死了QWEN的模型EOS Token
+                        max_new_tokens=generation_config.__dict__['max_new_tokens'],
                     )
                 ]
             )
@@ -152,10 +159,12 @@ def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, pr
             stopping_criteria = StoppingCriteriaList(
                 [
                     StopOnTokens(
+                        start_length=input_tokens.input_ids.shape[1],
                         stop_token_id=[tokenizer.eos_token_id],
+                        max_new_tokens=generation_config.__dict__['max_new_tokens'],
                     )
                 ]
-            )    
+            )  
 
         if generation_config.__dict__['max_new_tokens'] < 2000:
             ctx_size = 2048
@@ -166,7 +175,7 @@ def get_model_response(model: AutoModelForCausalLM, tokenizer: AutoTokenizer, pr
 
         input_tokens = tokenizer(prompt, return_tensors="pt")
         
-        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=generation_config.__dict__['repetition_penalty'], max_new_tokens=generation_config.__dict__['max_new_tokens'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=generation_config.__dict__['repetition_penalty'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
         # ITREX.cpp 不支持frequency_penalty参数，所以不尝试对退化的输出进行重试。
         response = tokenizer.decode(output)
         output = utils.split_response(response, model_version)

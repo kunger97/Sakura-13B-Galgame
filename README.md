@@ -41,8 +41,6 @@
 
 **已知问题：ITREX.CPP不支持frequency_penalty参数，无法通过调整这个参数来避免模型退化问题**
 
-**已知问题2：ITREX.CPP在传入stopping_criteria时会忽略max_new_tokens参数，导致模型退化时（无限输出某一段文本和字符）运行卡住，未来会想办法修复。**
-
 **推理速度在Intel Xeon 8480+ CPU下快于llama.cpp 8-10秒，Intel正在积极准备将相关优化合并到llama.cpp，未来本模式可能被移除**
 
 ### IPEX
