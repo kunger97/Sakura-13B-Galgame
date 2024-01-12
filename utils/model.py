@@ -170,13 +170,14 @@ def load_model(args: SakuraModelConfig):
         import torch
         import intel_extension_for_pytorch as ipex
         from transformers import AutoModelForCausalLM
-        model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
-        model = ipex.optimize(model, dtype=torch.bfloat16)
         if args.use_xpu:
-            model = model.to('xpu')
+            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="xpu", trust_remote_code=args.trust_remote_code, use_safetensors=False)
+        else:
+            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
+            model = ipex.optimize(model, dtype=torch.bfloat16)
     elif args.big_dl:
         from bigdl.llm.transformers import AutoModelForCausalLM  
-        model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True, use_flash_attn=False)
+        model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True)
         if args.use_xpu:
             model = model.to("xpu")
     else:

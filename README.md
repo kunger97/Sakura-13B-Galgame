@@ -46,12 +46,12 @@
 ### IPEX
 让pytorch支持英特尔XPU，可以将模型加载到英特尔独显上允许推理或微调 [intel-extension-for-pytorch](https://github.com/intel/intel-extension-for-pytorch)
 
-**已知问题：XPU不支持flash attention，请自行禁用flash attention或改用KV_Cache（好像也有问题）**
+**已知问题：XPU不支持flash attention，请自行禁用flash attention和KV_Cache**
 
 ### BigDL LLM
 支持加载经过量化和优化模型到英特尔XPU或CPU [BigDL](https://github.com/intel-analytics/BigDL)
 
-**已知问题：XPU不支持flash attention，请自行禁用flash attention或改用KV_Cache（好像也有问题）**
+**已知问题：XPU不支持flash attention，请自行禁用flash attention和KV_Cache**
 
 ## 快速开始
 
