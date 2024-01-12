@@ -167,9 +167,11 @@ def load_model(args: SakuraModelConfig):
         woq_config = WeightOnlyQuantConfig(compute_dtype="bf16", scale_dtype="bf16", weight_dtype=args.itrex_dtype)
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, quantization_config=woq_config, trust_remote_code=True)
     elif args.ipex:
+        import torch
         import intel_extension_for_pytorch as ipex
         from transformers import AutoModelForCausalLM
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
+        model = ipex.optimize(model, dtype=torch.bfloat16)
         if args.use_xpu:
             model = model.to('xpu')
     elif args.big_dl:
