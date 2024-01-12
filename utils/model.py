@@ -168,6 +168,7 @@ def load_model(args: SakuraModelConfig):
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, quantization_config=woq_config, trust_remote_code=True)
     elif args.ipex:
         import intel_extension_for_pytorch as ipex
+        from transformers import AutoModelForCausalLM
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
         if args.use_xpu:
             model = model.to('xpu')
@@ -177,6 +178,7 @@ def load_model(args: SakuraModelConfig):
         if args.use_xpu:
             model = model.to("xpu")
     else:
+        from transformers import AutoModelForCausalLM
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
 
     return (tokenizer, model)
