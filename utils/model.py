@@ -177,12 +177,9 @@ def load_model(args: SakuraModelConfig):
             model = ipex.optimize(model, dtype=torch.bfloat16)
     elif args.big_dl:
         from bigdl.llm.transformers import AutoModelForCausalLM  
+        model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True)
         if args.use_xpu:
-            # V9.0正式版模型在使用optimize_model于Intel(R) Data Center GPU Max 1100推理时出现严重的退化问题，所以改为False禁用
-            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=False, trust_remote_code=True, use_cache=True)
             model = model.to("xpu")
-        else:
-            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True)    
     else:
         from transformers import AutoModelForCausalLM
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)
