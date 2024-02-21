@@ -50,7 +50,7 @@ class SakuraModelConfig:
     big_dl: bool = False
     use_xpu: bool = False
 
-    itrex_dtype: str = "int8"
+    itrex_dtype: str = "int4"
     big_dl_dtype: str = "sym_int8"
 
     # vllm
@@ -163,6 +163,7 @@ def load_model(args: SakuraModelConfig):
         engine = AsyncLLMEngine.from_engine_args(engine_args)
         model = MixLLMEngine(engine)
     elif args.itrex_cpp:
+        logger.warning("Use ITREX(neural-speed) inference will ignore parameters pass via api")
         from intel_extension_for_transformers.transformers import AutoModelForCausalLM, WeightOnlyQuantConfig
         woq_config = WeightOnlyQuantConfig(compute_dtype="bf16", scale_dtype="bf16", weight_dtype=args.itrex_dtype)
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, quantization_config=woq_config, trust_remote_code=True)
@@ -434,6 +435,7 @@ class SakuraModel:
             delta_text = output_text.removeprefix(previous_output)
             previous_output = output_text
             yield delta_text, finish_reason
+
     def __itrex_cpp_model(self, model: ModelTypes, tokenizer: AutoTokenizer, prompt: str, model_version: str, generation_config: GenerationConfig):
         input_tokens = tokenizer(prompt, return_tensors="pt")
         input_tokens_len = input_tokens.input_ids.shape[-1]
@@ -490,7 +492,7 @@ class SakuraModel:
         else:
             ctx_size = generation_config.__dict__['max_new_tokens']
 
-        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=generation_config.__dict__['repetition_penalty'], temperature=generation_config.__dict__['temperature'], top_p=generation_config.__dict__['top_p'], do_sample=generation_config.__dict__['do_sample'])[0]
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=1.1, temperature=0.8, top_p=0.9, do_sample=generation_config.__dict__['do_sample'])[0]
         new_tokens = len(output) - input_tokens_len
         response = tokenizer.decode(output)
         output = utils.split_response(response, model_version)

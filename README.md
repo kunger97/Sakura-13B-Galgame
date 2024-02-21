@@ -26,22 +26,22 @@
 
 ### TODO：见https://github.com/SakuraLLM/Sakura-13B-Galgame/issues/42
 ## What's new in this repo
-允许英特尔CPU用户和XPU（ARC/DataCenterGPU）用户使用ITREX.CPP,IPEX,BigDL方式加载模型，利用英特尔硬件特性的性能优化。
+**llama.cpp现已支持英特尔iGPU和XPU（SYCL Backend），不会安装依赖的用户可以使用llama.cpp推理**
+
+允许英特尔CPU用户使用neural-speed，XPU（ARC/PVC）用户IPEX、BigDL方式加载模型，利用英特尔硬件特性的性能优化。（**这是一个自用的仓库，我可能不会完善全部API功能**）
 
 **其实我根本不会Python，对于使用中出现的问题，恕不提供支持**
 
-**ITREX和BIGDL会在加载时对模型进行量化，您可能需要稍等一段时间**
-
-**我们从未对原模型进行修改，对于模型输出存在的任何问题（由于ITREX.cpp不支持某些参数，可能导致预期外的输出行为），请到原Repo中反馈**
+**neural-speed和BIGDL会在加载时对模型进行量化，您可能需要稍等一段时间**
 
 **以下库均各自有依赖包，请参阅各仓库文档安装**
 
-### ITREX.CPP
-为英特尔硬件打造的提供硬件加速的类似于llama.cpp工具（暂不支持XPU加速）[intel-extension-for-transformers](https://github.com/intel/intel-extension-for-transformers/)
+### neural-speed
+**您需要编译安装neural-speed的最新版本才能使用QWEN（0.9）模型**
 
-**已知问题：ITREX.CPP不支持frequency_penalty参数，无法通过调整这个参数来避免模型退化问题**
+为英特尔硬件打造的提供硬件加速的类似于llama.cpp工具[neural-speed](https://github.com/intel/neural-speed/)
 
-**推理速度在Intel Xeon 8480+ CPU下快于llama.cpp 8-10秒，Intel正在积极准备将相关优化合并到llama.cpp，未来本模式可能被移除**
+**neural-speed将会使用默认的推理参数，您通过API传入的推理参数将被忽略，neural-speed不支持流式输出**
 
 ### IPEX
 让pytorch支持英特尔XPU，可以将模型加载到英特尔独显上允许推理或微调 [intel-extension-for-pytorch](https://github.com/intel/intel-extension-for-pytorch)
@@ -49,6 +49,8 @@
 **已知问题：XPU不支持flash attention，请自行禁用flash attention和KV_Cache**
 
 ### BigDL LLM
+**请安装预发行版的BIGDL以便支持QWEN（0.9）模型优化**
+
 支持加载经过量化和优化模型到英特尔XPU或CPU [BigDL](https://github.com/intel-analytics/BigDL)
 
 **已知问题：XPU不支持flash attention，请自行禁用flash attention和KV_Cache**
