@@ -491,7 +491,7 @@ class SakuraModel:
         else:
             ctx_size = generation_config.__dict__['max_new_tokens']
 
-        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=1.2f, temperature=0.85, top_p=0.9, do_sample=True)[0]
+        output = model.generate(input_tokens.input_ids, stopping_criteria=stopping_criteria, ctx_size=ctx_size, repetition_penalty=1.2, temperature=0.85, top_p=0.9, do_sample=True)[0]
         new_tokens = len(output) - input_tokens_len
         response = tokenizer.decode(output)
         output = utils.split_response(response, model_version)
