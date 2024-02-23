@@ -118,7 +118,7 @@ def load_model(args: SakuraModelConfig):
 
     logger.info("loading model ...")
 
-    if not args.llama_cpp:
+    if not args.llama_cpp and not args.gguf:
         if args.llama:
             tokenizer = LlamaTokenizer.from_pretrained(args.model_name_or_path, trust_remote_code=args.trust_remote_code)
         else:
@@ -178,11 +178,12 @@ def load_model(args: SakuraModelConfig):
             model = ipex.optimize(model, dtype=torch.bfloat16)
     elif args.big_dl:
         from bigdl.llm.transformers import AutoModelForCausalLM  
-        if args.use_xpu:
-            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True)
-            model = model.to("xpu")
+        if args.gguf:
+            model,tokenizer = AutoModelForCausalLM.from_gguf(args.model_name_or_path)
         else:
-            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True)    
+            model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, load_in_low_bit = args.big_dl_dtype, optimize_model=True, trust_remote_code=True, use_cache=True)  
+        if args.use_xpu:
+              model = model.to("xpu")
     else:
         from transformers import AutoModelForCausalLM
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="auto", trust_remote_code=args.trust_remote_code, use_safetensors=False)

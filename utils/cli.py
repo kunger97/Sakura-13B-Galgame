@@ -30,6 +30,7 @@ def parse_args(do_validation:bool=False, add_extra_args_fn:any=None):
     parser.add_argument("--itrex_dtype", type=str, default="int4", help="quantized level of neural-speed now support ['int3','fp32', 'int8', 'int4', 'fp8', 'fp4', 'nf4']")
     parser.add_argument("--ipex", action="store_true", help="whether to use intel extension for pytorch load model")
     parser.add_argument("--big_dl", action="store_true", help="whether to use big-dl llm to load model")
+    parser.add_argument("--gguf", action="store_true", help="load gguf model use bigdl")
     parser.add_argument("--big_dl_dtype", type=str, default="sym_int8", help="quantized level of big_dl now support ['sym_int4', 'asym_int4', 'sym_int5', 'asym_int5' , 'sym_int8', 'nf3', 'nf4', 'fp4', 'fp8', 'fp8_e4m3', 'fp8_e5m2', 'fp16', 'bf16']")
     parser.add_argument("--use_xpu", action="store_true", help="whether to use XPU in ipex or big-dl llm")
 
