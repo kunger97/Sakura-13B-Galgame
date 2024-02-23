@@ -49,6 +49,7 @@ class SakuraModelConfig:
     ipex: bool = False
     big_dl: bool = False
     use_xpu: bool = False
+    gguf: bool = False
 
     itrex_dtype: str = "int4"
     big_dl_dtype: str = "sym_int8"
@@ -223,7 +224,7 @@ class SakuraModel:
         self.model = model
 
         try:
-            if not cfg.llama_cpp:
+            if not cfg.llama_cpp and not cfg.gguf:
                 if cfg.vllm:
                     # vllm Engine doesn't have config attr, we need to reload config from pretrained
                     config = PretrainedConfig.from_pretrained(self.cfg.model_name_or_path)
