@@ -8,6 +8,8 @@
 🤗 <a href="https://huggingface.co/sakuraumi/Sakura-13B-Galgame" target="_blank">Hugging Face</a> • 🤖 <a href="https://www.modelscope.cn/models/sakuraumi/Sakura-13B-Galgame" target="_blank">ModelScope</a>
 </p>
 
+# 目前Sakura发布的所有模型均采用[CC BY-NC-SA 4.0协议](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans)，Sakura所有模型与其衍生模型均禁止任何形式的商用！
+
 # 介绍
 
 - 基于一系列开源大模型构建，在通用日文语料与轻小说/Galgame等领域的中日语料上进行继续预训练与微调，旨在提供性能接近GPT3.5且完全离线的Galgame/轻小说翻译大语言模型。
@@ -93,7 +95,7 @@ p.s. 如果无法连接到HuggingFace服务器，可将链接中的`huggingface.
    轻小说机翻机器人网站是一个自动生成轻小说机翻并分享的网站。你可以浏览日文网络小说，或者上传Epub/Txt文件，并生成机翻。
 
 1. [LunaTranslator](https://github.com/HIllya51/LunaTranslator)已经支持Sakura API，可以通过本地部署API后端，并在LunaTranslator中配置Sakura API来使用Sakura模型进行Galgame实时翻译。  
-    使用[KurikoMoe](https://github.com/kurikomoe/LunaTranslator/releases/latest)的版本可以支持流式输出。
+    ~~使用[KurikoMoe](https://github.com/kurikomoe/LunaTranslator/releases/latest)的版本可以支持流式输出。~~ 目前官方版本已经支持流式输出，只需在翻译设置界面勾选流式输出即可。
 
    LunaTranslator是一个Galgame翻译工具，支持剪贴板、OCR、HOOK，支持40余种翻译引擎。
 
@@ -107,7 +109,11 @@ p.s. 如果无法连接到HuggingFace服务器，可将链接中的`huggingface.
 
 1. [AiNiee](https://github.com/NEKOparapa/AiNiee-chatgpt)已经支持Sakura API，可以通过本地部署API后端，在AiNiee中使用Sakura模型进行翻译。
 
-  AiNiee是一款基于【mtool】或【Translator++】，chatgpt自动批量翻译工具，主要是用来翻译各种RPG游戏。
+   AiNiee是一款基于【mtool】或【Translator++】，chatgpt自动批量翻译工具，主要是用来翻译各种RPG游戏。
+
+1. [manga-image-translator](https://github.com/zyddnys/manga-image-translator)已经支持Sakura API，可以通过本地部署API后端，使用Sakura自动翻译漫画。
+
+1. [BallonsTranslator](https://github.com/dmMaze/BallonsTranslator)已经支持Sakura API，可以通过本地部署API后端，使用Sakura翻译漫画。
 
 # 显存需求
 
@@ -152,7 +158,7 @@ p.s. 如果无法连接到HuggingFace服务器，可将链接中的`huggingface.
   
 - 轻小说
 
-  网站：[轻小说机翻机器人](https://books.fishhawk.top/)已接入Sakura模型(v0.8-4bit)，站内有大量模型翻译的轻小说可供参考。
+  网站：[轻小说机翻机器人](https://books.fishhawk.top/)已接入Sakura模型(v0.9b-Q4_K_M)，站内有大量模型翻译的轻小说可供参考。
 
 - PPL/BLEU/Human
 
