@@ -175,7 +175,7 @@ def load_model(args: SakuraModelConfig):
     elif args.itrex_cpp:
         logger.warning("Use ITREX(neural-speed) inference will ignore parameters pass via api")
         from intel_extension_for_transformers.transformers import AutoModelForCausalLM, WeightOnlyQuantConfig
-        woq_config = WeightOnlyQuantConfig(compute_dtype="bf16", scale_dtype="bf16", weight_dtype=args.itrex_dtype, group_size=128)
+        woq_config = WeightOnlyQuantConfig(compute_dtype="int8", scale_dtype="bf16", weight_dtype=args.itrex_dtype, group_size=128)
         model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, quantization_config=woq_config, trust_remote_code=True)
     elif args.ipex:
         import torch
