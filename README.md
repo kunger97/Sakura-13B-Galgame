@@ -38,7 +38,9 @@
 
 **以下库均各自有依赖包，请参阅各仓库文档安装**
 
-### neural-speed
+### neural-speed [即将弃用]
+**由于该项目是一个开发初期的项目，API经常变动，且不支持部分推理参数，所以在相关稳定版发布前，将不再提供neural-speed的API（预计在主仓库合并[#59](https://github.com/SakuraLLM/Sakura-13B-Galgame/pull/59)后移除）**
+
 **您需要编译安装neural-speed的最新版本才能使用QWEN（0.9）模型**
 
 为英特尔硬件打造的提供硬件加速的类似于llama.cpp工具[neural-speed](https://github.com/intel/neural-speed/)
