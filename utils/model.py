@@ -187,7 +187,7 @@ def load_model(args: SakuraModelConfig):
             model = AutoModelForCausalLM.from_pretrained(args.model_name_or_path, device_map="cpu", trust_remote_code=args.trust_remote_code, use_safetensors=False)
             model = ipex.optimize(model, dtype=torch.bfloat16)
     elif args.big_dl:
-        from bigdl.llm.transformers import AutoModelForCausalLM  
+        from ipex_llm.transformers import AutoModelForCausalLM 
         if args.gguf:
             model,tokenizer = AutoModelForCausalLM.from_gguf(args.model_name_or_path)
         else:
