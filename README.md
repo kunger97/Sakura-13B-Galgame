@@ -31,7 +31,9 @@
 
 ## IPEX-LLM
 
-** llama.cpp 现已支持英特尔XPU/GPU（ARC/PVC）并已添加IQ系列量化支持，请自行编译最新版llmam.cpp执行推理 **
+> neural-speed模型加载方式已被弃用，旧版本代码请查看neural-speed分支
+
+**llama.cpp 现已支持英特尔XPU/GPU（ARC/PVC）并已添加IQ系列量化支持，请自行编译最新版llmam.cpp执行推理**
 
 ![IPEX-LLM](https://github.com/intel-analytics/ipex-llm)是英特尔基于IPEX（![intel-extension-for-pytorch](https://github.com/intel/intel-extension-for-pytorch)）实现的一个LLM运行库，支持使用英特尔设备GPU/CPU的硬件加速，并对一些模型（QWEN/Baichuan等）进行了优化。本仓库代码增加了使用IPEX-LLM加载模型的逻辑，可以在英特尔设备上更快的运行Sakura大模型。
 
@@ -52,6 +54,8 @@ OneAPI运行库下载地址：`https://www.intel.com/content/www/us/en/developer
 `pip install --pre --upgrade ipex-llm[xpu] --extra-index-url https://pytorch-extension.intel.com/release-whl/stable/xpu/us/`
 
 #### 3.执行Sakura Server脚本
+
+> 使用IPEX-LLM加载模型而生成的翻译结果请特别注明模型版本和IPEX量化版本，IPEX-LLM可能会对模型进行原地量化，官方并未支持和验证IPEX-LLM方式加载模型及量化模型
 
 ** TODO **
 
