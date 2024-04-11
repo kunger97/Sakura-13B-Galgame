@@ -53,6 +53,13 @@ class SakuraModelConfig:
     # ollama
     ollama: bool = False
 
+    # ipex-llm
+    ipex_llm: bool = False
+    use_xpu: bool = False
+    ipex_quant: str = 'sym_int8'
+    optimize_model: bool = False
+    cpu_embedding: bool = False
+
     # read from config.json (model_name_or_path)
     model_name: str | None = None
     model_quant: str | None = None
@@ -113,6 +120,17 @@ def load_model(args: SakuraModelConfig) -> (Any, ModelTypes):
     elif args.vllm:
         from infers.vllm import MixLLMEngine
         model = MixLLMEngine(args)
+    elif args.ipex_llm:
+        from ipex_llm.transformers import AutoModelForCausalLM
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_name_or_path,
+            load_in_low_bit = args.ipex_quant,
+            optimize_model=args.optimize_model,
+            cpu_embedding=args.cpu_embedding,
+            trust_remote_code=True,
+            use_cache=True)
+        if args.use_xpu:
+            model = model.to('xpu') 
     # Legacy transformer
     else:
         model = AutoModelForCausalLM.from_pretrained(
