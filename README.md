@@ -29,6 +29,32 @@
 
 ### TODO：见https://github.com/SakuraLLM/Sakura-13B-Galgame/issues/42
 
+## IPEX-LLM
+
+** llama.cpp 现已支持英特尔XPU/GPU（ARC/PVC）并已添加IQ系列量化支持，请自行编译最新版llmam.cpp执行推理 **
+
+![IPEX-LLM](https://github.com/intel-analytics/ipex-llm)是英特尔基于IPEX（![intel-extension-for-pytorch](https://github.com/intel/intel-extension-for-pytorch)）实现的一个LLM运行库，支持使用英特尔设备GPU/CPU的硬件加速，并对一些模型（QWEN/Baichuan等）进行了优化。本仓库代码增加了使用IPEX-LLM加载模型的逻辑，可以在英特尔设备上更快的运行Sakura大模型。
+
+### 安装IPEX-LLM
+
+#### 1.安装Intel产品驱动程序和OneAPI运行库
+
+OneAPI运行库下载地址：`https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit-download.html`
+
+激活OneAPI环境 （替换成你的安装路径）
+`source /opt/intel/oneapi/setvars.sh`
+
+#### 2.安装IPEX和IPEX-LLM
+
+**推荐您使用Conda或venv虚拟环境来安装和管理依赖，SakuraLLM仓库需要Python3.10，IPEX-LLM推荐Python3.11**
+
+使用pip安装IPEX-LLM（会自动安装IPEX）
+`pip install --pre --upgrade ipex-llm[xpu] --extra-index-url https://pytorch-extension.intel.com/release-whl/stable/xpu/us/`
+
+#### 3.执行Sakura Server脚本
+
+** TODO **
+
 ## 快速开始
 
 ### 教程：
