@@ -57,7 +57,15 @@ OneAPI运行库下载地址：`https://www.intel.com/content/www/us/en/developer
 
 > 使用IPEX-LLM加载模型而生成的翻译结果请特别注明模型版本和IPEX量化版本，IPEX-LLM可能会对模型进行原地量化，官方并未支持和验证IPEX-LLM方式加载模型及量化模型
 
-** TODO **
+下面展示了IPEX-LLM所特有的加载选项
+
+```
+    --ipex_llm 使用IPEX-LLM加载模型
+    --use_xpu 使用Intel GPU加载模型（XPU/dGPU/iGPU）
+    --ipex_quant IPEX-LLM量化等级，IPEX-LLM会对模型进行原地量化，目前支持['sym_int4', 'asym_int4', 'sym_int5', 'asym_int5', 'sym_int8', 'nf3', 'nf4', 'fp4', 'fp8', 'fp8_e4m3', 'fp8_e5m2', 'fp16', 'bf16']
+    --optimize_model 使用IPEX-LLM对模型的优化，IPEX内置一些优化选项，启用该参数可能导致模型退化，请自行测试
+    --cpu_embedding 启用该选项可以节省一些显存（不同于llama.cpp将部分模型移至CPU推理，您仍然需要有足够的显存来运行模型）
+```
 
 ## 快速开始
 
