@@ -369,12 +369,7 @@ class SakuraModel:
                     "This is a very rare situation, please check your input or open an issue.")
 
             if is_print_speed:
-                logger.info(
-                    'Output generated in " + \
-                    f"{(t1 - t0):.2f} seconds " + \
-                    f"({new_tokens / (t1 - t0):.2f} tokens/s, " + \
-                    f"{new_tokens} tokens, " + \
-                    f"context {input_tokens_len} tokens)')
+                logger.info(f'Output generated in {(t1-t0):.2f} seconds ({new_tokens/(t1-t0):.2f} tokens/s, {new_tokens} tokens, context {input_tokens_len} tokens)')
 
             # whether model stops because eos token or length limit
             if new_tokens == generation_config.__dict__['max_new_tokens']:
