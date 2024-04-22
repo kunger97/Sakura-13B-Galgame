@@ -1,7 +1,10 @@
 <div align="center">
 <h1>
-  Sakura-13B-Galgame
+  SakuraLLM
 </h1>
+<center>
+  <b>Sakura</b>: <b><ins>S</ins></b>FT <ins><b>A</b></ins>nd RLHF models using <ins><b>K</b></ins>nowledge of <ins><b>U</b></ins>niversal Character and <ins><b>R</b></ins>elationship <ins><b>A</b></ins>ttributes for Japanese to Chinese Translation in Light Novel & Galgame Domain.
+</center>
 </div>
 
 <p align="center">
@@ -80,7 +83,7 @@ OneAPI运行库下载地址：`https://www.intel.com/content/www/us/en/developer
 | 20231026-Baichuan2 13B v0.8 | 🤗 [Sakura-13B-LNovel-v0.8](https://huggingface.co/SakuraLLM/Sakura-13B-LNovel-v0.8) | 🤗 [Sakura-13B-LNovel-v0_8-GGUF](https://huggingface.co/SakuraLLM/Sakura-13B-LNovel-v0.8-GGUF) | 🤗 [Sakura-13B-LNovel-v0_8-8bit](https://huggingface.co/SakuraLLM/Sakura-13B-LNovel-v0_8-8bit) | 🤗 [Sakura-13B-LNovel-v0_8-4bit](https://huggingface.co/SakuraLLM/Sakura-13B-LNovel-v0_8-4bit) | 🤗 [Sakura-13B-LNovel-v0_8-3bit](https://huggingface.co/SakuraLLM/Sakura-13B-LNovel-v0_8-3bit) | 🤗 [Sakura-13B-LNovel-v0_8-AWQ](https://huggingface.co/SakuraLLM/Sakura-13B-LNovel-v0_8-AWQ) |
 | 20240111-Qwen-14B-v0.9 | 🤗 [Sakura-13B-LNovel-v0.9](https://huggingface.co/SakuraLLM/Sakura-13B-LNovel-v0.9) | 🤗 [Sakura-13B-LNovel-v0.9b-GGUF](https://huggingface.co/SakuraLLM/Sakura-13B-LNovel-v0.9b-GGUF) | - | - | - | - |
 | 20240116-Qwen-7B-v0.9 | - | 🤗 [Sakura-7B-LNovel-v0.9-GGUF](https://huggingface.co/SakuraLLM/Sakura-7B-LNovel-v0.9-GGUF) | - | - | - | - |
-| 20240213-Qwen1.5-14B-v0.9 | 🤗 [Sakura-14B-Qwen2beta-v0.9](https://huggingface.co/SakuraLLM/Sakura-14B-Qwen2beta-v0.9) | - | - | - | - |
+| 20240213-Qwen1.5-14B-v0.9 | 🤗 [Sakura-14B-Qwen2beta-v0.9](https://huggingface.co/SakuraLLM/Sakura-14B-Qwen2beta-v0.9) | 🤗 [Sakura-14B-Qwen2beta-v0.9-GGUF](https://huggingface.co/SakuraLLM/Sakura-14B-Qwen2beta-v0.9-GGUF) | - | - | - |
 | 20240214-Qwen1.5-1.8B-v0.9.1 | 🤗 [Sakura-1B8-Qwen2beta-v0.9.1](https://huggingface.co/SakuraLLM/Sakura-1B8-Qwen2beta-v0.9.1) | 🤗 [Sakura-1B8-Qwen2beta-v0.9.1](https://huggingface.co/SakuraLLM/Sakura-1B8-Qwen2beta-v0.9.1-GGUF) | - | - | - |
 | 20240303-Qwen1.5-14B-v0.10pre0 | 🤗 [Sakura-14B-Qwen2beta-v0.10pre0](https://huggingface.co/SakuraLLM/Sakura-14B-Qwen2beta-v0.10pre0) | 🤗 [Sakura-14B-Qwen2beta-v0.10pre0-GGUF](https://huggingface.co/SakuraLLM/Sakura-14B-Qwen2beta-v0.10pre0-GGUF) | - | - | - | - |
 
