@@ -45,12 +45,13 @@ def parse_args(do_validation:bool=False, add_extra_args_fn:any=None):
     ollama_group.add_argument("--ollama", action="store_true", help="whether to use ollama.")
 
     # IPEX-LLM backend
-    parser.add_argument("--ipex_llm", action="store_true", help="whether to use ipex-llm.")
-    parser.add_argument("--use_xpu", action="store_true", help="whether to use intel GPU when using ipex-llm.")
-    parser.add_argument("--ipex_quant", type=str, default="sym_int8",
+    ipex_group = parser.add_argument_group("Intel IPEX-LLM backend")
+    ipex_group.add_argument("--ipex_llm", action="store_true", help="whether to use ipex-llm.")
+    ipex_group.add_argument("--use_xpu", action="store_true", help="whether to use intel GPU when using ipex-llm.")
+    ipex_group.add_argument("--ipex_quant", type=str, default="sym_int8",
                         help="IPEX-LLM can load model in low bit ['sym_int4', 'asym_int4', 'sym_int5', 'asym_int5', 'sym_int8', 'nf3', 'nf4', 'fp4', 'fp8', 'fp8_e4m3', 'fp8_e5m2', 'fp16', 'bf16']")
-    parser.add_argument("--optimize_model", action="store_true", help="whether to use ipex-llm optimize for model(may make model degeneration).")
-    parser.add_argument("--cpu_embedding", action="store_true", help="enable cpu embedding may save vram.")
+    ipex_group.add_argument("--optimize_model", action="store_true", help="whether to use ipex-llm optimize for model(may make model degeneration).")
+    ipex_group.add_argument("--cpu_embedding", action="store_true", help="enable cpu embedding may save vram.")
 
     # Deprecated
     abandon_group = parser.add_argument_group("Deprecated Options")
