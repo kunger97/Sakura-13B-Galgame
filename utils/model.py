@@ -60,6 +60,9 @@ class SakuraModelConfig:
     optimize_model: bool = False
     cpu_embedding: bool = False
 
+    # neural-speed
+    neural_speed: bool = False
+
     # read from config.json (model_name_or_path)
     model_name: str | None = None
     model_quant: str | None = None
@@ -84,6 +87,12 @@ def load_model(args: SakuraModelConfig) -> (Any, ModelTypes):
             tokenizer = LlamaTokenizer.from_pretrained(
                 args.model_name_or_path,
                 trust_remote_code=args.trust_remote_code)
+        elif args.neural_speed:
+            tokenizer = AutoTokenizer.from_pretrained(
+                args.model_name_or_path,
+                use_fast=False,
+                trust_remote_code=args.trust_remote_code,
+                use_safetensors=False)
         else:
             tokenizer = AutoTokenizer.from_pretrained(
                 args.model_name_or_path,
@@ -131,6 +140,9 @@ def load_model(args: SakuraModelConfig) -> (Any, ModelTypes):
             use_cache=True)
         if args.use_xpu:
             model = model.to('xpu') 
+    elif args.neural_speed:
+        from infers.neuralspeed import NeuralSpeed
+        model = NeuralSpeed(args)
     # Legacy transformer
     else:
         model = AutoModelForCausalLM.from_pretrained(
@@ -167,6 +179,8 @@ class SakuraModel:
                 if cfg.vllm:
                     # vllm Engine doesn't have config attr, we need to reload config from pretrained
                     config = PretrainedConfig.from_pretrained(self.cfg.model_name_or_path)
+                elif cfg.neural_speed:
+                     config = PretrainedConfig.from_pretrained(self.cfg.model_name_or_path)
                 else:
                     config = self.model.config
                 model_name = config.sakura_name
@@ -350,6 +364,8 @@ class SakuraModel:
                     output, (input_tokens_len, new_tokens) = model.generate(prompt, generation_config)
                 elif self.cfg.vllm:
                     output, (input_tokens_len, new_tokens) = model.generate(prompt, generation_config)
+                elif self.cfg.neural_speed:
+                    output, (input_tokens_len, new_tokens) = model.generate(tokenizer, prompt, model_version, generation_config)
                 else:
                     output, (input_tokens_len, new_tokens) = self.__general_model(model, tokenizer, prompt,
                                                                                   model_version, generation_config)
@@ -415,6 +431,11 @@ class SakuraModel:
             for output, finish_reason in model.stream_generate(prompt, generation_config):
                 token_cnt += 1
                 yield output, finish_reason
+        elif self.cfg.neural_speed:
+            prompt = self.make_prompt_stable(messages)
+            for output, finish_reason in model.stream_generate(tokenizer, prompt, model_version, generation_config):
+                token_cnt += 1
+                yield output, finish_reason
         else:
             self.check_messages(messages)
             for output, finish_reason in self.__general_model_stream(model, tokenizer, messages, model_version,
@@ -472,6 +493,8 @@ class SakuraModel:
             output, (input_tokens_len, new_tokens) = model.generate(prompt, generation_config)
         elif self.cfg.vllm:
             output, (input_tokens_len, new_tokens) = model.generate(prompt, generation_config)
+        elif self.cfg.neural_speed:
+                   output, (input_tokens_len, new_tokens) = model.generate(tokenizer, prompt, model_version, generation_config)
         else:
             output, (input_tokens_len, new_tokens) = self.__general_model(model, tokenizer, prompt, model_version,
                                                                           generation_config)
@@ -489,6 +512,8 @@ class SakuraModel:
                 output, (input_tokens_len, new_tokens) = model.generate(prompt, generation_config)
             elif self.cfg.vllm:
                 output, (input_tokens_len, new_tokens) = model.generate(prompt, generation_config)
+            elif self.cfg.neural_speed:
+                    output, (input_tokens_len, new_tokens) = model.generate(tokenizer, prompt, model_version, generation_config)
             else:
                 output, (input_tokens_len, new_tokens) = self.__general_model(model, tokenizer, prompt, model_version,
                                                                               generation_config)

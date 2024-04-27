@@ -181,3 +181,5 @@ pyrightconfig.json
 data_translated.txt
 models/
 compose.yaml
+
+/runtime_outs

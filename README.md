@@ -32,15 +32,27 @@
 
 ### TODO：见https://github.com/SakuraLLM/Sakura-13B-Galgame/issues/42
 
-## IPEX-LLM
+## Intel设备优化加速
 
-> neural-speed模型加载方式已被弃用，旧版本代码请查看neural-speed分支
+> 已经重新添加Intel NeuralSpeed CPU推理加速库
 
-**llama.cpp 现已支持英特尔XPU/GPU（ARC/PVC）并已添加IQ系列量化支持，请自行编译最新版llmam.cpp执行推理**
+请编译安装最新版NeuralSpeed库`https://github.com/intel/neural-speed/`
+
+运行时请直接使用HF全量模型，NeuralSpeed加载时会对模型进行原地Int4量化并缓存，第二次加载会尝试从缓存加载。
+
+```
+    --neural_speed 使用NeuralSpeed加速的CPU推理
+```
+
+> llama.cpp现已支持SYCL后端，可以使用Intel加速器加速大模型推理
+
+请编译安装最新版本的llama.cpp以获取SYCL后端支持和IQ系列量化支持`https://github.com/ggerganov/llama.cpp`
+
+> IPEX-LLM 提供了基于IPEX优化的模型加载，可以提供比llama.cpp更高的推理效率
 
 [IPEX-LLM](https://github.com/intel-analytics/ipex-llm)是英特尔基于IPEX（[intel-extension-for-pytorch](https://github.com/intel/intel-extension-for-pytorch)）实现的一个LLM运行库，支持使用英特尔设备GPU/CPU的硬件加速，并对一些模型（QWEN/Baichuan等）进行了优化。本仓库代码增加了使用IPEX-LLM加载模型的逻辑，可以在英特尔设备上更快的运行Sakura大模型。
 
-### 安装IPEX-LLM
+### IPEX-LLM
 
 #### 1.安装Intel产品驱动程序和OneAPI运行库
 

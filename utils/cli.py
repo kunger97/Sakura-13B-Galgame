@@ -53,6 +53,10 @@ def parse_args(do_validation:bool=False, add_extra_args_fn:any=None):
     ipex_group.add_argument("--optimize_model", action="store_true", help="whether to use ipex-llm optimize for model(may make model degeneration).")
     ipex_group.add_argument("--cpu_embedding", action="store_true", help="enable cpu embedding may save vram.")
 
+    # Neural_speed backend
+    ne_group = parser.add_argument_group("Intel Neural Speed Backend")
+    ne_group.add_argument("--neural_speed", action="store_true", help="whether to use neural_speed.")
+
     # Deprecated
     abandon_group = parser.add_argument_group("Deprecated Options")
     abandon_group.add_argument("--llama", action="store_true", help="whether your model is llama family.")
