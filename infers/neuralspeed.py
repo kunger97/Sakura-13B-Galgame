@@ -17,7 +17,7 @@ class NeuralSpeed(BaseInferEngine):
         logger.warn("NeuralSpeed is being used for generation. Due to missing parameters, the generation results may be incorrect.")
         NEModel = Model();
         #Choose the best compute_dtype and scal_dtype see this website: https://github.com/intel/neural-speed/blob/main/neural_speed/core/README.md
-        NEModel.init(args.model_name_or_path, alg="asym", group_size=128, scale_dtype="fp32", compute_dtype="int8")
+        NEModel.init(args.model_name_or_path, alg="asym", group_size=128, scale_dtype="bf16", compute_dtype="int8")
         self.model = NEModel
         return
 
