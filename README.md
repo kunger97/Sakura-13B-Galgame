@@ -32,6 +32,8 @@
 
 > 已经重新添加Intel NeuralSpeed CPU推理加速库
 
+**NeuralSpeed再QWEN2（QWEN1.5）模型推理时存在问题，推荐使用QWEN模型**
+
 请编译安装最新版NeuralSpeed库`https://github.com/intel/neural-speed/`
 
 运行时请直接使用HF全量模型，NeuralSpeed加载时会对模型进行原地Int4量化并缓存，第二次加载会尝试从缓存加载。
